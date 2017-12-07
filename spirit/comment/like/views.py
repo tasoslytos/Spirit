@@ -11,13 +11,14 @@ from ..models import Comment
 from .models import CommentLike
 from .forms import LikeForm
 
-
+'''
 @login_required
-def create(request, comment_id):
+def create(request, comment_id, five_stars):
     comment = get_object_or_404(Comment.objects.exclude(user=request.user), pk=comment_id)
-
+	
     if request.method == 'POST':
-        form = LikeForm(user=request.user, comment=comment, data=request.POST)
+        form = LikeForm(user=request.user, comment=comment, five_stars=five_stars, data=request.POST)
+#        form = LikeForm(user=request.user, comment=comment, data=request.POST)
 
         if form.is_valid():
             like = form.save()
@@ -36,8 +37,43 @@ def create(request, comment_id):
     }
 
     return render(request, 'spirit/comment/like/create.html', context)
+'''
 
+@login_required
+def update(request, comment_id, five_stars):
+        
+    comment = get_object_or_404(Comment.objects.exclude(user=request.user), pk=comment_id)
+    if request.method == 'POST':
+        form = LikeForm(user=request.user, comment=comment, five_stars=five_stars, data=request.POST)
 
+        if form.is_valid():
+			#if commentlike exists - update the five_stars value
+            try:
+                if CommentLike.objects.get(user=request.user, comment=comment) is not None:
+                    like = CommentLike.objects.get(user=request.user, comment=comment)
+                    like.five_stars = five_stars
+                    like.save()
+                
+			#if else create a new object                 
+            except CommentLike.DoesNotExist:
+                like = form.save()
+                like.comment.increase_likes_count()			
+			
+            if request.is_ajax():
+                return json_response({'url_delete': like.get_delete_url(), })
+
+            return redirect(request.POST.get('next', comment.get_absolute_url()))
+    else:
+        form = LikeForm()
+
+    context = {
+        'form': form,
+        'comment': comment
+    }
+
+    return render(request, 'spirit/comment/like/create.html', context)
+
+'''
 @login_required
 def delete(request, pk):
     like = get_object_or_404(CommentLike, pk=pk, user=request.user)
@@ -55,3 +91,4 @@ def delete(request, pk):
     context = {'like': like, }
 
     return render(request, 'spirit/comment/like/delete.html', context)
+'''
