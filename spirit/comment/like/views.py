@@ -10,7 +10,6 @@ from ...core.utils import json_response
 from ..models import Comment
 from .models import CommentLike
 from .forms import LikeForm
-
 @login_required
 def update(request, comment_id, five_stars):
         
