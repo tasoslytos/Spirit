@@ -10,7 +10,9 @@
     <meta name="description" content="{{ config.site_description }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" href="{% static "spirit/stylesheets/styles.all.min.css" %}">
+    <link rel="stylesheet" href="{% static 'spirit/stylesheets/styles.all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'spirit/stylesheets/profitstyles.css %}">    
+
 
     <script src="{% static "spirit/scripts/all.min.js" %}"></script>
 
@@ -53,10 +55,13 @@
 
   <body>
 
+    {% include 'spirit/_profit_header.html' %}
     {% include 'spirit/_header.html' %}
     {% render_messages messages %}
     {% block content %}{% endblock %}
     {% include 'spirit/_footer.html' %}
+    {% include 'spirit/_profit_footer.html' %}
+
 
   </body>
 
