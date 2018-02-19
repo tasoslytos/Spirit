@@ -9,6 +9,13 @@ from django.utils import timezone
 
 from ...core.conf import settings
 
+STARS_VALUES = (
+	(1, _('First')),
+	(3, _('Second')),
+	(3, _('Third')),
+	(4, _('Four')),
+	(5, _('Five'))
+)
 
 class CommentLike(models.Model):
 
@@ -16,6 +23,8 @@ class CommentLike(models.Model):
     comment = models.ForeignKey('spirit_comment.Comment', related_name='comment_likes')
 
     date = models.DateTimeField(default=timezone.now)
+    five_stars = models.IntegerField(choices = STARS_VALUES, default=3, null=True)
+
 
     class Meta:
         unique_together = ('user', 'comment')

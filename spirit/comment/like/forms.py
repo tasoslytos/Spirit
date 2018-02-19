@@ -14,16 +14,17 @@ class LikeForm(forms.ModelForm):
         model = CommentLike
         fields = []
 
-    def __init__(self, user=None, comment=None, *args, **kwargs):
+    def __init__(self, user=None, comment=None, five_stars=None, *args, **kwargs):
         super(LikeForm, self).__init__(*args, **kwargs)
         self.user = user
         self.comment = comment
+        self.five_stars = five_stars
 
     def clean(self):
         cleaned_data = super(LikeForm, self).clean()
 
         like = CommentLike.objects.filter(user=self.user,
-                                          comment=self.comment)
+                                          comment=self.comment, five_stars=self.five_stars)
 
         if like.exists():
             # Do this since some of the unique_together fields are excluded.
@@ -35,5 +36,7 @@ class LikeForm(forms.ModelForm):
         if not self.instance.pk:
             self.instance.user = self.user
             self.instance.comment = self.comment
+            self.instance.five_stars = self.five_stars
+            print(self.instance.five_stars)
 
         return super(LikeForm, self).save(commit)
