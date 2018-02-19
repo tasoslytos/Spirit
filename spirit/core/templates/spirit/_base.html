@@ -10,10 +10,10 @@
     <meta name="description" content="{{ config.site_description }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" href='{% static "spirit/stylesheets/styles.all.min.css" %}'>
-    <link rel="stylesheet" href='{% static "spirit/stylesheets/profitstyles.css" %}'>    
+    <link rel="stylesheet" href="{% static 'spirit/stylesheets/styles.all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'spirit/stylesheets/profitstyles.css' %}">    
 
-    <script src='{% static "spirit/scripts/all.min.js" %}'></script>
+    <script src="{% static 'spirit/scripts/all.min.js' %}"></script>
 
     <script>
 
@@ -42,7 +42,8 @@
 	});
 
 	</script>
-	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
 
     {% block head-extra %}{% endblock %}
 
