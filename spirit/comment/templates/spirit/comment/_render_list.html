@@ -52,17 +52,18 @@
 
                         <li><a class="js-share" href="#" data-dialog=".js-share-{{ c.pk }}"><i class="fa fa-share"></i> {% trans "share" %}</a></li>
 
+
 						&nbsp;
                         {% if user.is_authenticated %}
                         
 						<span class="rating-choices" data-rating="0">
 							{% if c.like and c.user != user %}
 								<li class="comment-like"> <i class="fa fa-heart"></i>
-									<a class="icon-rating" data-value="1" href="{% url "spirit:comment:like:update" c.pk 1 %}"><i class="fa fa-star icon-star {% if c.like.five_stars >= 1 %}icon-star-active{% endif %}">&nbsp;</i></a>
-									<a class="icon-rating" data-value="2" href="{% url "spirit:comment:like:update" c.pk 2 %}"><i class="fa fa-star icon-star {% if c.like.five_stars >= 2 %}icon-star-active{% endif %}">&nbsp;</i></a>
-									<a class="icon-rating" data-value="3" href="{% url "spirit:comment:like:update" c.pk 3 %}"><i class="fa fa-star icon-star {% if c.like.five_stars >= 3 %}icon-star-active{% endif %}">&nbsp;</i></a>
-									<a class="icon-rating" data-value="4" href="{% url "spirit:comment:like:update" c.pk 4 %}"><i class="fa fa-star icon-star {% if c.like.five_stars >= 4 %}icon-star-active{% endif %}">&nbsp;</i></a>
-									<a class="icon-rating" data-value="5" href="{% url "spirit:comment:like:update" c.pk 5 %}"><i class="fa fa-star icon-star {% if c.like.five_stars >= 5 %}icon-star-active{% endif %}">&nbsp;</i></a>
+									<a class="icon-rating" class="like"data-value="1" href="{% url "spirit:comment:like:update" c.pk 1 %}"><i class="fa fa-star icon-star {% if c.like.five_stars >= 1 %}icon-star-active{% endif %}">&nbsp;</i></a>
+									<a class="icon-rating" class="like"data-value="2" href="{% url "spirit:comment:like:update" c.pk 2 %}"><i class="fa fa-star icon-star {% if c.like.five_stars >= 2 %}icon-star-active{% endif %}">&nbsp;</i></a>
+									<a class="icon-rating" class="like"data-value="3" href="{% url "spirit:comment:like:update" c.pk 3 %}"><i class="fa fa-star icon-star {% if c.like.five_stars >= 3 %}icon-star-active{% endif %}">&nbsp;</i></a>
+									<a class="icon-rating" class="like"data-value="4" href="{% url "spirit:comment:like:update" c.pk 4 %}"><i class="fa fa-star icon-star {% if c.like.five_stars >= 4 %}icon-star-active{% endif %}">&nbsp;</i></a>
+									<a class="icon-rating" class="like"data-value="5" href="{% url "spirit:comment:like:update" c.pk 5 %}"><i class="fa fa-star icon-star {% if c.like.five_stars >= 5 %}icon-star-active{% endif %}">&nbsp;</i></a>
 								</li>
 							{% elif c.user == user %}
 									<li class="comment-like"> <i class="fa fa-heart"></i>
@@ -83,20 +84,21 @@
 									
 							{% endif %}
 
-						</span>                        
+						</span> 
 
-{% comment %}                        								
-								{% if c.like %}
-									<li class="comment-like"><a class="js-like" href="{% url "spirit:comment:like:delete" c.like.pk %}" data-count="{{ c.likes_count }}" ><i class="fa fa-heart"></i> {% trans "remove like" %} ({{ c.likes_count }})</a></li>
-								{% else %}
-								
-									{% ifnotequal c.user user  %}
-										<li class="comment-like"><a class="js-like" class="like" href="{% url "spirit:comment:like:create" c.pk 1 %}" data-count="{{ c.likes_count }}" ><i class="fa fa-heart"></i> {% trans "like" %} ({{ c.likes_count }})</a></li>
-									{% else %}
-										<li class="comment-like"><i class="fa fa-heart"></i> ({{ c.likes_count }})</li>
-									{% endifnotequal %}
-								{% endif %}
-{% endcomment %}                        								
+
+{% comment %}
+                            {% if c.like %}
+                                <li class="comment-like"><a class="js-like" href="{% url "spirit:comment:like:delete" c.like.pk %}" data-count="{{ c.likes_count }}" ><i class="fa fa-heart"></i> {% trans "remove like" %} ({{ c.likes_count }})</a></li>
+                            {% else %}
+                                {% ifnotequal c.user user  %}
+                                    <li class="comment-like"><a class="js-like" class="like" href="{% url "spirit:comment:like:create" c.pk %}" data-count="{{ c.likes_count }}" ><i class="fa fa-heart"></i> {% trans "like" %} ({{ c.likes_count }})</a></li>
+                                {% else %}
+                                    <li class="comment-like"><i class="fa fa-heart"></i> ({{ c.likes_count }})</li>
+                                {% endifnotequal %}
+                            {% endif %}
+{% endcomment %}
+
 
                             {% if user.st.is_moderator or c.user.pk == user.pk %}
                                 <li><a href="{% url "spirit:comment:update" pk=c.pk %}" >{% trans "edit" %}</a></li>
@@ -104,7 +106,7 @@
 
                             {% ifnotequal c.user.pk user.pk %}
                                 <li><a href="{% url "spirit:comment:publish" topic_id=topic.pk pk=c.pk %}" >{% trans "quote" %}</a></li>
-                                <li><a href="#reply" >{% trans "reply" %}</a></li>
+                                <li><a href="#reply" class="js-reply-button" data="@{{ c.user.username }}" >{% trans "reply" %}</a></li>
                             {% endifnotequal %}
                         {% endif %}
                     </ul>
@@ -163,22 +165,28 @@
 </div>
 
 
+{% comment %}
+{% if c.like %}
+	<li class="comment-like"><a class="js-like" href="{% url "spirit:comment:like:delete" c.like.pk %}" data-count="{{ c.likes_count }}" ><i class="fa fa-heart"></i> {% trans "remove like" %} ({{ c.likes_count }})</a></li>
+{% else %}
+	{% ifnotequal c.user user  %}
+	<li class="comment-like"><a class="js-like" class="like" href="{% url "spirit:comment:like:create" c.pk %}" data-count="{{ c.likes_count }}" ><i class="fa fa-heart"></i> {% trans "like" %} ({{ c.likes_count }})</a></li>
+	{% else %}
+	<li class="comment-like"><i class="fa fa-heart"></i> ({{ c.likes_count }})</li>
+{% endifnotequal %}
+	{% endif %}
+{% endcomment %}
+
     <script>
-
 	$( document ).ready(function() {
-
         {% if user.is_authenticated %}
             $('.js-like').like( {
                 csrfToken: "{{ csrf_token }}",
                 likeText: "{% trans "like" %} ({count})",
                 removeLikeText: '{% trans "remove like" %} ({count})',
-            } );
+            } );            
         {% endif %}
-
         $('.js-share').social_share();
-
-        hljs.initHighlightingOnLoad();
-
+		hljs.initHighlightingOnLoad();
 	});
-
 	</script>
