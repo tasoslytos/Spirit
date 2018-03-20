@@ -5,6 +5,17 @@
 * Adds support for Python 3.6
 * Adds support for Django 1.9, 1.10 and 1.11
 * Adds python-magic dependency (to check uploaded files)
+* Improvement: focus on comment editor after
+  clicking a format button. PR #219 (thanks to @cryptogun)
+* Fixes: untranslated strings. PR #218 (thanks to @cryptogun)
+* Fixes: missing link on admin flag. PR #217 (thanks to @cryptogun)
+* Fixes: `XForwardedForMiddleware` middleware and
+  gunicorn error. PR #216 (thanks to @cryptogun)
+* Improvement: Add `@username` on comment editor
+  when clicking on a reply link. PR #212 (thanks to @cryptogun)
+* Improvement: notifications page drop-down
+  menu for read/unread. PR #213 (thanks to @cryptogun)
+* New: lithuanian translation, thanks to @sirex
 * New: file upload on comments
 * Improvement: Adds `ST_UPLOAD_IMAGE_ENABLED`
   to enable/disable image uploads and `ST_UPLOAD_FILE_ENABLED`
@@ -14,6 +25,7 @@
   read the wiki or the PR for a workaround
 * Updates mistune, haystack and woosh dependencies
 * Deprecates `spirit.settings`. It will be removed in future releases
+* Updates locales
 
 0.4.8
 ==================
