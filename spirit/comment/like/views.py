@@ -10,43 +10,25 @@ from ...core.utils import json_response
 from ..models import Comment
 from .models import CommentLike
 from .forms import LikeForm
+
+
 @login_required
-def update(request, comment_id, five_stars):
-        
+def create(request, comment_id):
     comment = get_object_or_404(Comment.objects.exclude(user=request.user), pk=comment_id)
-    print(request.method)
     
-    if request.method == 'GET':
-        form = LikeForm(user=request.user, comment=comment, five_stars=five_stars, data=request.POST)
+    if request.method == 'POST':
+        form = LikeForm(user=request.user, comment=comment, data=request.POST)
 
         if form.is_valid():
-            print("The form is valid")            
-        else:
-            print (form.errors)
- 
-		#if commentlike exists - update the five_stars value
-        try:
-            if CommentLike.objects.get(user=request.user, comment=comment) is not None:
-                print("CommentLike.objects is not None")
-                like = CommentLike.objects.get(user=request.user, comment=comment)
-                like.five_stars = five_stars
-                like.save()
-                
-		#if else create a new object                 
-        except CommentLike.DoesNotExist:
-            print("We create a new object")
             like = form.save()
-            like.comment.increase_likes_count()			
-			
-        if request.is_ajax():
-            print("The request is ajax")
+            like.comment.increase_likes_count()
 
-        return redirect(request.POST.get('next', comment.get_absolute_url()))
-        
-
+            if request.is_ajax():
+                return json_response({'url_delete': like.get_delete_url(), })
+            
+            return redirect(request.POST.get('next', comment.get_absolute_url()))
     else:
-    #    form = LikeForm()
-         return redirect(request.POST.get('next', comment.get_absolute_url()))
+        form = LikeForm()
 
     context = {
         'form': form,
@@ -93,3 +75,21 @@ def update(request, comment_id, five_stars):
 
     return redirect(request.POST.get('next', comment.get_absolute_url()))
     #return render(request, 'spirit/comment/like/create.html', context)
+
+@login_required
+def delete(request, pk):
+    like = get_object_or_404(CommentLike, pk=pk, user=request.user)
+
+    if request.method == 'POST':
+        like.delete()
+        like.comment.decrease_likes_count()
+
+        if request.is_ajax():
+            url = reverse('spirit:comment:like:create', kwargs={'comment_id': like.comment.pk, })
+            return json_response({'url_create': url, })
+
+        return redirect(request.POST.get('next', like.comment.get_absolute_url()))
+
+    context = {'like': like, }
+
+    return render(request, 'spirit/comment/like/delete.html', context)
