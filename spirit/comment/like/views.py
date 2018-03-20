@@ -15,7 +15,7 @@ from .forms import LikeForm
 @login_required
 def create(request, comment_id):
     comment = get_object_or_404(Comment.objects.exclude(user=request.user), pk=comment_id)
-    
+
     if request.method == 'POST':
         form = LikeForm(user=request.user, comment=comment, data=request.POST)
 
@@ -25,7 +25,7 @@ def create(request, comment_id):
 
             if request.is_ajax():
                 return json_response({'url_delete': like.get_delete_url(), })
-            
+
             return redirect(request.POST.get('next', comment.get_absolute_url()))
     else:
         form = LikeForm()
