@@ -24,7 +24,7 @@ class LikeForm(forms.ModelForm):
         cleaned_data = super(LikeForm, self).clean()
 
         like = CommentLike.objects.filter(user=self.user,
-                                          comment=self.comment,five_stars=self.five_stars)
+                                          comment=self.comment, five_stars=self.five_stars)
 
         if like.exists():
             # Do this since some of the unique_together fields are excluded.
@@ -37,5 +37,6 @@ class LikeForm(forms.ModelForm):
             self.instance.user = self.user
             self.instance.comment = self.comment
             self.instance.five_stars = self.five_stars
+            print(self.instance.five_stars)
 
         return super(LikeForm, self).save(commit)

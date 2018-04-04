@@ -1,29 +1,34 @@
 {% load spirit_tags i18n %}
-
 {% load static from staticfiles %}
 <!doctype html>
 <html>
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-	
-	<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-	<meta name="description" content="{% trans 'PROFIT platform demo' %}">
-	<meta name="author" content="Katerina Katmada">
-	<link rel="icon" href="{% static 'images/favicon.png' %}" type="image/png">
-	<title>{% trans 'PROFIT Platform' %}</title>
-    
+
+    <title>{% block title %}{% endblock %} - {{ config.site_name }}</title>
+    <meta name="description" content="{{ config.site_description }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link rel="stylesheet" href="{% static 'spirit/stylesheets/styles.all.min.css' %}">
-    <link rel="stylesheet" href="{% static 'spirit/stylesheets/styles.css' %}">
-    
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <link rel="stylesheet" href="{% static 'spirit/stylesheets/profitstyles.css' %}">    
+
+	<!-- PROFIT js -->
+	<script src="{% static 'js/lib/jquery/jquery-1.12.4.min.js' %}"></script>
+	<script src="{% static 'js/bootstrap.min.js' %}"></script>
+	<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+	<script src="{% static 'lib/ie10-viewport-bug-workaround/ie10-viewport-bug-workaround.js' %}"></script>
+    <script src="{% static 'js/lib/intro.js/intro.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'js/lib/intro.js/introjs.css' %}"/>
+    <link rel="stylesheet" href="{% static 'js/lib/intro.js/introjs-local.css' %}"/>
+
+    <script type="text/javascript">window.CSRF_TOKEN = "{{ csrf_token }}";</script>
+
+	<!-- /PROFIT js -->
+
+
 
     <script src="{% static 'spirit/scripts/all.min.js' %}"></script>
-    <script src="{% static 'spirit/scripts/js/bootstrap.min.js' %}"></script>
-    <script src="{% static 'spirit/scripts/js/lib/jquery/jquery-1.12.4.min.js' %}"></script>
-
 
     <script>
 
@@ -53,7 +58,14 @@
 
 	</script>
 
+
+
     {% block head-extra %}{% endblock %}
+
+    <!--[if (lt IE 9) & (!IEMobile)]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/selectivizr/1.0.2/selectivizr-min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.6/html5shiv.min.js"></script>
+    <![endif]-->
 
   </head>
 
@@ -63,7 +75,9 @@
     {% include 'spirit/_header.html' %}
     {% render_messages messages %}
     {% block content %}{% endblock %}
+    {% include 'spirit/_footer.html' %}
     {% include 'spirit/_profit_footer.html' %}
+
 
   </body>
 
