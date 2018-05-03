@@ -7139,7 +7139,6 @@ input.move-comment-checkbox {
   margin-bottom: 24px; }
   @media screen and (min-width: 768px) {
     .paginator {
-      float: left;
       display: block;
       margin-right: 3.57866%;
       width: 48.21067%; }

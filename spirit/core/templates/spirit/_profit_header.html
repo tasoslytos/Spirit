@@ -1,107 +1,317 @@
 {% load i18n %}
 {% load static %}
 {% load profit %}
+{% load web_resources %}
+
 
 {{ config.template_footer|safe }}
+    {% block navbar %}
 
         <nav class="navbar navbar-default navbar-fixed-top" id="top">
             <div class="container1 logo">
                 <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <button type="button1" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
                         <span class="sr-only">{% trans 'Toggle navigation' %}</span>
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="/"><img src="{% static 'images/profit_small.png' %}" height="44" alt="PROFIT logo"></a>
+                    <a class="navbar-brand" href="/">
+                        <div id="navbar-profit-logo"></div>
+                    </a>
                 </div>
 
                 <div id="navbar" class="navbar-collapse collapse">
-                    <div class="navbar-right">
-                        <form class="navbar-form navbar-left" role="search" id="custom-search-input">
-                            <div class="input-group">
-                                <input type="text" class="form-control" placeholder="{% trans 'Search' %}">
-                                <span class="input-group-btn">
-                                    <button class="btn btn-default" type="button">
-                                        <img style="max-width: none;" src="{% static 'images/platform_icons/zoom-blue.svg' %}" height="20"
-                                             alt="{% trans 'Search' %}">
-                                    </button>
-                                </span>
-                            </div>
-                        </form>
 
+                    <div class="navbar-right">
+                    {% if request.user.is_authenticated %}
                         <ul class="nav1 navbar-nav1 navbar-right">
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                                    <img class="menu_icons" src="{% static 'images/platform_icons/chart_top_menu-blue.svg' %}" height="20" alt="{% trans 'Platform activity' %}" title="{% trans 'Platform activity' %}">
-                                    <span class="visible-xs-inline icon-label">{% trans 'Platform activity' %}</span>
-                                </a>
-                                <ul class="dropdown-menu" role="menu">
-                                    <li><a href="{% url 'article:articles' %}">{% trans 'Articles' %}</a></li>
-                                    <li><a href="{% url 'polls:index' %}">{% trans 'Polls' %}</a></li>
-                                    <li><a href="{% url 'spirit:index' %}">{% trans 'Discussions' %}</a></li>
-                                </ul>
-                            </li>
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                                    <img class="menu_icons" src="{% static 'images/platform_icons/read-blue.svg' %}" height="20" alt="{% trans 'Learning center' %}" title="{% trans 'Learning center' %}">
-									<span class="visible-xs-inline icon-label">{% trans 'Learning center' %}</span>
-                                </a>
-                                <ul class="dropdown-menu" role="menu">
-                                    <li><a href="{% url 'financial_toolkit:test' %}">{% trans 'Financial literacy test' %}</a></li>
-                                    <li><a href="{% url 'financial_toolkit:thematic_units' %}">{% trans 'Educational material' %}</a></li>
-                                    <li><a href="{#{% url 'quiz:index' %}#}">{% trans 'Quiz' %}</a></li>
-                                    <li><a href="{% url 'sentiment:sentiment_recession' %}">{% trans 'Market sentiment' %}</a></li>
-                                    <li><a href="{% url 'forecasting:forecast_oil' %}">{% trans 'Forecasting results' %}</a></li>
-                                </ul>
-                            </li>
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                                    <img class="menu_icons" src="{% static 'images/platform_icons/write-blue.svg' %}" height="20" alt="{% trans 'Contribute' %}" title="{% trans 'Contribute' %}">
-									<span class="visible-xs-inline icon-label">{% trans 'Contribute' %}</span>
-                                </a>
-                                <ul class="dropdown-menu" role="menu">
-                                    <li><a href="{% url 'article:manage:user:create' %}">{% trans 'Create/Upload article' %}</a></li>
-                                    <li><a href="{% url 'polls:addPolls' %}">{% trans 'Create/Edit Poll' %}</a></li>
-                                    <li><a href="#">{% trans 'Create/Upload educational material' %}</a></li>
-                                    <li><a href="#">{% trans 'Edit educational material' %}</a></li>
-                                    <li><a href="{#{% url 'crowd_sourcing:index' %}#}">{% trans 'Update knowledge graph' %}</a></li>
-                                </ul>
-                            </li>
-                            {% if unseen_notifications %}
-                                <li>{#{% unseen_notifications_badge unseen_notifications %}#}</li>
-                            {% endif %}
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-									{% if request.user.is_authenticated %}
-                                        {% if request.user.userprofile.profile_image %}                                        
-											<img class="menu_icons img-rounded" src="{{ request.user.userprofile.profile_image.thumbnail.url }}" height="20" alt="{% trans 'User profile' %}" title="{% trans 'User profile' %}">
+                        <li class="{% active '^/(articles|external-article|article|manage-article)' %}">
+                            <a href="{% url 'article:newest' %}" class="dropdown-toggle"
+                            data-toggle="dropdown" role="button" aria-expanded="false">
+                                {% trans 'Articles' %}
+                                <span class="fa fa-caret-down"></span>
+                            </a>
+                            <ul class="dropdown-menu wide-menu" role="menu">
+                                <li>
+                                    <a href="{% url 'article:newest' %}">{% trans 'All articles' %}</a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'article:bookmarked' %}">{% trans 'My bookmarked articles' %}</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                    <a href="{% url 'article:manage:user:create' %}">
+                                        {% trans 'Create your own article' %}
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="{% active '^/(financial-toolkit|quiz)' %}">
+                            <a href="{% url 'financial_toolkit:thematic_units' %}" class="dropdown-toggle"
+                               data-toggle="dropdown" role="button" aria-expanded="false">
+                                <span class="visible-lg-inline">
+                                    {% trans 'Educational material' %}
+                                </span>
+                                <span class="hidden-lg">
+                                    {% trans 'Education' %}
+                                </span>
+                                <span class="fa fa-caret-down"></span>
+                            </a>
+                            <ul class="dropdown-menu wide-menu" role="menu">
+                                <li>
+                                    <a href="{% url 'financial_toolkit:thematic_units' %}">
+                                        {% trans 'Choose a topic' %}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'financial_toolkit:personalized_thematic_units' %}">
+                                        {% trans 'Personalized navigation' %}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'quiz:index' %}">{% trans 'Play a quiz game' %}</a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'financial_toolkit:test' %}">
+                                        {% trans 'Financial Literacy Test' %}
+                                        {% if user_passed_literacy_test %}
+                                            <span class="navbar-item-subtext navbar-item-subtext-right navbar-item-subtext-completed">
+                                                <span class="fa fa-check-circle-o"></span>
+                                                {% trans 'Already passed' %}</span>
                                         {% else %}
-                                            <img class="menu_icons" src="{% static 'images/platform_icons/user_top_menu-blue.svg' %}" height="20" alt="{% trans 'User profile' %}" title="{% trans 'User profile' %}">
+                                            <span class="navbar-item-subtext navbar-item-subtext-right navbar-item-subtext-open">
+                                                {% trans 'Take the test' %}
+                                            </span>
                                         {% endif %}
-                                        <span class="visible-xs-inline icon-label">{% trans 'User profile' %}</span>
-                                    {% else %}
-                                        <img class="menu_icons" src="{% static 'images/platform_icons/user_top_menu-blue.svg' %}" height="20" alt="{% trans 'Login/Register' %}" title="{% trans 'Login/Register' %}">
-                                        <span class="visible-xs-inline icon-label">{% trans 'Login/Register' %}</span>
-                                    {% endif %}
-                                </a>
-                                <ul class="dropdown-menu" role="menu">
-                                    {# TODO - upraviť odkazy, pridať podľa profile.html #}
-                                    {% if request.user.is_authenticated %}
-                                        {# TODO: active link should have class=dp-active #}
-                                        <li><a href="{% url 'userprofile:profile' request.user.username %}">{% trans 'Dashboard' %}</a></li>
-                                        <li><a href="{% url 'userprofile:settings:general' %}">{% trans 'Settings' %}</a></li>
-                                        <li><a href="help.html">{% trans 'Help center' %}</a></li>
-                                        <li class="divider"></li>
-                                        <li><a href="{% url 'logout' %}">{% trans 'Logout' %}</a></li>
-                                    {% else %}
-                                        <li><a href="{% url 'login' %}">{% trans 'Login' %}</a></li>
-                                        <li><a href="{% url 'registration_register' %}">{% trans 'Register' %}</a></li>
-                                    {% endif %}
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="{% active '^/(forecasting|sentiment|crowd-sourcing)' %}">
+                            <a href="#" class=dropdown-toggle data-toggle="dropdown" role="button"
+                               aria-expanded="false">
+                                <span class="visible-lg-inline">
+                                    {% trans 'Advanced tools' %}
+                                </span>
+                                <span class="hidden-lg">
+                                    {% trans 'Advanced' %}
+                                </span>
+                                <span class="fa fa-caret-down"></span>
+                            </a>
+                            <ul class="dropdown-menu wide-menu" role="menu">
+                                <li>
+                                    <a href="{% url 'forecasting:index' %}">
+                                        {% trans 'Forecasting' %}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'sentiment:index' %}">
+                                        {% trans 'Market sentiment' %}
+                                    </a>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                    <a href="{% url 'crowd_sourcing:index' %}">
+                                        {% trans 'Update knowledge graph' %}
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="{% active '^/(spirit|polls)' %}">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-expanded="false">
+                                {% trans 'Social' %}
+                                <span class="fa fa-caret-down"></span>
+                                <ul class="dropdown-menu wide-menu" role="menu">
+                                    <li>
+                                        <a href="{% url 'spirit:index' %}">{% trans 'Discussions' %}</a>
+                                    </li>
+                                    <li>
+                                        <a href="{% url 'polls:index' %}">{% trans 'Polls' %}</a>
+                                    </li>
+                                    <li class="divider"></li>
+                                    <li>
+                                        <a href="{% url 'polls:addPolls' %}">{% trans 'Create your own poll' %}</a>
+                                    </li>
+                                    
                                 </ul>
+                            </a>
+                        </li>
+                        <li class="nav-search">
+
+                            <form class="navbar-form" role="search" id="navbar-search" action="{% url 'article:search' %}" method="get">
+                                <div class="input-group">
+                                    <input name="s" type="text" class="form-control" placeholder="{% trans 'Search' %}" autocomplete="off">
+                                    <span class="input-group-btn">
+                                        <button type="reset" class="btn btn-default">
+                                            <span class="fa fa-remove">
+                                                <span class="sr-only">{% trans 'Close' %}</span>
+                                            </span>
+                                        </button>
+                                        <button type="submit" class="btn btn-default">
+                                            <span class="fa fa-search">
+                                                <span class="sr-only">{% trans 'Search' %}</span>
+                                            </span>
+                                        </button>
+                                    </span>
+                                </div>
+                            </form>
+
+                            <a href="{% url 'article:search' %}" role="button" id="nav-search-trigger">
+                                <span class="fa fa-search"></span>
+                                <span class="hidden-sm hidden-md hidden-lg">{% trans 'Search' %}</span>
+                            </a>
+                        </li>
+                        {% if not request.user.userprofile.has_active_consent %}
+                            <li>
+                                {% if not request.user.userprofile.grace_period_end_date %}
+                                    {% trans 'Personal data processing consent has not been given' as consent_not_given %}
+                                    <a href="{% url 'userprofile:settings:privacy:general' %}"
+                                       title="{{ consent_not_given }}">
+                                        <span class="fa fa-ban text-danger"></span>
+                                        <span class="sr-only">{{ consent_not_given }}</span>
+                                        <span class="visible-xs-inline">{{ consent_not_given }}</span>
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'userprofile:grace-period-warning' %}">
+                                        {% blocktrans asvar grace_period_text trimmed with request.user.userprofile.grace_period_end_date|date:"DATE_FORMAT" as end_date %}
+                                            Your acount will be deleted after {{ end_date }}
+                                        {% endblocktrans %}
+                                        <span class="text-danger">
+                                            <span class="fa fa-ban"></span>
+                                            <span class="visible-lg-inline visible-xs-inline"
+                                                  title="{{ grace_period_text }}">
+                                                {% trans 'Grace period' %}
+                                            </span>
+                                        </span>
+                                        <span class="visible-xs-inline">{{ grace_period_text }}</span>
+                                    </a>
+                                {% endif %}
                             </li>
+                        {% endif %}
+                        <li>
+                            {% blocktrans asvar notifications_title count counter=unseen_notifications trimmed %}
+                                {{ counter }} unseen notification
+                            {% plural %}
+                                {{ counter }} unseen notifications
+                            {% endblocktrans %}
+                            <a href="{% url 'userprofile:notifications' username=request.user.username %}"
+                            title="{{ notifications_title }}">
+                                <span class="fa fa-bell"></span>
+                                {% if unseen_notifications %}
+                                    <span class="badge badge-notification">{{ unseen_notifications }}</span>
+                                {% endif %}
+                                <span class="visible-xs-inline">
+                                    {% trans 'Notifications' %} ({{ notifications_title }})
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            {# TODO: fixme, simmilar as notifications (in a new feature branch) #}
+                            <a href="{% url 'userprofile:activity:messages' username=request.user.username %}">
+                                <span class="fa fa-comments"></span>
+                                <span class="sr-only">{% trans 'Messages' %}</span>
+                            </a>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                                <span class="hidden-sm">
+                                    {{ request.user.userprofile.short_name }}
+                                </span>
+                                {% with request.user.userprofile.profile_image as profile_image %}
+                                    {% if profile_image %}
+                                        <img src="{{ profile_image.thumbnail.url }}" class="navbar-profile-image img-circle"
+                                             alt="{% trans 'Profile image' %}" title="{{ request.user.userprofile.full_name }}">
+                                    {% else %}
+                                        <img src="{% static 'images/platform_icons/user_top_menu-blue.svg' %}" class="navbar-profile-image img-circle"
+                                             alt="{% trans 'Profile image' %}" title="{{ request.user.userprofile.full_name }}">
+                                    {% endif %}
+                                {% endwith %}
+                            </a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li>
+                                    <a href="{% url 'userprofile:profile' request.user.username %}">{% trans 'Profile' %}</a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'userprofile:activity:posts' request.user.username %}">{% trans 'My activity' %}</a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'userprofile:recommendations' %}">{% trans 'Recommendations' %}</a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'userprofile:settings:profile' %}">{% trans 'Account settings' %}</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                    <a href="{% url 'logout' %}" class="logout">
+                                        {% trans 'Logout' %}
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
                         </ul>
+                    {% else %}
+                        <ul class="nav1 navbar-nav1 navbar-right">
+                        <li class="{% active 'about' %}">
+                            <a href="{% url 'about' %}">{% trans 'About' %}</a>
+                        </li>
+                        <li class="{% active '^/(articles|external\-article|article)' %}">
+                            <a href="{% url 'article:newest' %}">{% trans 'Articles' %}</a>
+                        </li>
+                        <li class="dropdown {% active '^/(financial-toolkit|quiz)' %}">
+                            <a href="{% url 'financial_toolkit:thematic_units' %}" class="dropdown-toggle"
+                               data-toggle="dropdown" role="button" aria-expanded="false">
+                                {% trans 'Educational material' %}
+                                <span class="fa fa-caret-down"></span>
+                            </a>
+                            <ul class="dropdown-menu wide-menu" role="menu">
+                                <li>
+                                    <a href="{% url 'financial_toolkit:thematic_units' %}">
+                                        {% trans 'Courses' %}
+                                    </a>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                    <a href="{% url 'financial_toolkit:test' %}">
+                                        {% trans 'Financial literacy test' %}
+                                        <span class="navbar-item-subtext navbar-item-subtext-right navbar-item-subtext-open">
+                                            {% trans 'Take the test' %}
+                                        </span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="{% active 'login' %}">
+                            <a href="{% url 'login' %}">{% trans 'Login' %}</a>
+                        </li>
+                        <li>
+                                <a href="{% url 'registration_register' %}" class="btn btn-primary navbar-btn navbar-btn-green">
+                                    {% trans 'Get started' %}
+                                </a>
+                        </li>
+                        </ul>
+                    {% endif %}
                     </div>
+
                 </div>
             </div>
         </nav>
+    {% endblock navbar %}
+
+    {% block messages %}
+        <div class="container1" id="floating-alert">
+            <div class="row1">
+                <div class="col-xs-12">
+                    {% for message in messages %}
+                        {% alert message %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endblock messages %}
+
+    <div class="site-content">
+    {% block content %}
+    {% endblock content %}
+    </div>
