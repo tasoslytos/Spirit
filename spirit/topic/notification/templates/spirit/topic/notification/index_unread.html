@@ -7,7 +7,7 @@
 {% block content %}
     {% include "spirit/topic/notification/_top_bar.html" with active="unread_notifications" %}
 
-    <div class="rows">
+    <div class="spirit-rows">
         {% if page %}
             {% include "spirit/topic/notification/_render_list.html" with notifications=page %}
         {% else %}

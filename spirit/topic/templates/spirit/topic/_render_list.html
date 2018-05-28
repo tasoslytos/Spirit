@@ -1,12 +1,12 @@
 {% load spirit_tags i18n %}
 
 {# topic list #}
-        <div class="rows">
+        <div class="spirit-rows">
 
         {% for t in topics %}
-			<div class="row">
+			<div class="spirit-row">
 
-                <div class="row-title">
+                <div class="spirit-row-title">
                     {% if t.is_pinned or t.is_globally_pinned %}
                         <i class="fa fa-thumb-tack"></i>
                     {% endif %}
@@ -14,9 +14,9 @@
                         <i class="fa fa-lock"></i>
                     {% endif %}
 
-                    <a class="row-link{% if t.is_visited %} is-visited{% endif %}" href="{{ t.get_bookmark_url }}">{{ t.title }}</a>
+                    <a class="spirit-row-link{% if t.is_visited %} is-visited{% endif %}" href="{{ t.get_bookmark_url }}">{{ t.title }}</a>
                 </div>
-                <div class="row-info">
+                <div class="spirit-row-info">
                     <div>
 
 
