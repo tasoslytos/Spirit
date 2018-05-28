@@ -4,7 +4,7 @@
 
 {% block title %}{% trans "Publish topic" %}{% endblock %}
 
-{% block head-extra %}
+{% block head-extra1 %}
     <script>
 
 	$( document ).ready(function() {
@@ -14,11 +14,11 @@
 	});
 
 	</script>
-{% endblock %}
+{% endblock head-extra1 %}
 
 {% block content %}
 
-    <h1 class="headline">{% trans "Publish topic" %}</h1>
+    <h4 class="headline">{% trans "Publish topic" %}</h4>
 
     <form action="." method="post" class="js-reply">
         {% csrf_token %}
@@ -34,7 +34,7 @@
         <div class="container">
             {% include "spirit/comment/_editor.html" %}
 
-            <input class="button reply-button" type="submit" value="{% trans "Publish" %}" />
+            <input class="btn btn-primary reply-button" type="submit" value="{% trans "Publish" %}" />
         </div>
     </form>
 

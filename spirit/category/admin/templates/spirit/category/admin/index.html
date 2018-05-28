@@ -8,14 +8,14 @@
 
     {% include "spirit/admin/_side_menu.html" with active="categories" %}
 
-    <h1 class="headline">{% trans "Category list" %}</h1>
+    <h4 class="headline">{% trans "Category list" %}</h4>
 
-    <a class="button" href="{% url "spirit:admin:category:create" %}">{% trans "Create Category" %}</a>
+    <a style="margin-bottom: 15px;" class="btn btn-success" href="{% url "spirit:admin:category:create" %}">{% trans "Create Category" %}</a>
 
-    <div class="rows">
+    <div class="spirit-rows">
 
         {% for c in categories %}
-            <div class="row">
+            <div class="spirit-row">
                 <a {% if c.color %}style="color: {{ c.color }}"{% endif %} href="{{ c.get_absolute_url }}">{{ c.title }}</a>
 
                 {% if c.is_removed %}
@@ -26,11 +26,11 @@
                     <i class="fa fa-lock"></i>
                 {% endif %}
 
-                <a class="row-edit" href="{% url "spirit:admin:category:update" category_id=c.pk %}"><i class="fa fa-cog"></i> {% trans "edit" %}</a>
+                <a class="spirit-row-edit" href="{% url "spirit:admin:category:update" category_id=c.pk %}"><i class="fa fa-cog"></i> {% trans "edit" %}</a>
             </div>
 
             {% for subc in c.category_set.all %}
-                <div class="row">
+                <div class="spirit-row">
                     --- <a {% if subc.color %}style="color: {{ subc.color }}"{% endif %} href="{{ subc.get_absolute_url }}">{{ subc.title }}</a>
 
                     {% if subc.is_removed %}
@@ -41,7 +41,7 @@
                         <i class="fa fa-lock"></i>
                     {% endif %}
 
-                    <a class="row-edit" href="{% url "spirit:admin:category:update" category_id=subc.pk %}"><i class="fa fa-cog"></i> {% trans "edit" %}</a>
+                    <a class="spirit-row-edit" href="{% url "spirit:admin:category:update" category_id=subc.pk %}"><i class="fa fa-cog"></i> {% trans "edit" %}</a>
                 </div>
             {% endfor %}
         {% endfor %}

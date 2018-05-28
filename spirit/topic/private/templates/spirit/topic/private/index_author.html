@@ -8,10 +8,10 @@
 
     {% include "spirit/topic/private/_top_bar.html" with active="left" %}
 
-    <div class="rows">
+    <div class="spirit-rows">
 
         {% for t in topics %}
-            <div class="row">
+            <div class="spirit-row">
                 <a href="{% url "spirit:topic:private:join" topic_id=t.pk %}">{{ t.title }}</a> <a class="row-edit js-post" href="{% url "spirit:topic:private:join" topic_id=t.pk %}"><i class="fa fa-users"></i> {% trans "join" %}</a>
             </div>
         {% empty %}
