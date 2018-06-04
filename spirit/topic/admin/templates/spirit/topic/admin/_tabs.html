@@ -1,6 +1,6 @@
 {% load i18n %}
 
-<ul class="tabs">
+<ul class="nav nav-tabs">
 	<li><a class="tab-link{% ifequal active_tab "deleted" %} is-selected{% endifequal %}" href="{% url "spirit:admin:topic:deleted" %}" >{% trans "Deleted" %}</a></li><!--
  --><li><a class="tab-link{% ifequal active_tab "closed" %} is-selected{% endifequal %}" href="{% url "spirit:admin:topic:closed" %}" >{% trans "Closed" %}</a></li><!--
  --><li><a class="tab-link{% ifequal active_tab "pinned" %} is-selected{% endifequal %}" href="{% url "spirit:admin:topic:pinned" %}" >{% trans "Pinned" %}</a></li>

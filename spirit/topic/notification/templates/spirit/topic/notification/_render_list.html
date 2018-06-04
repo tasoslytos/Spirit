@@ -1,7 +1,7 @@
 {% load i18n %}
 
         {% for n in notifications %}
-            <div class="row">
+            <div class="spirit-row">
                 {% url "spirit:user:detail" pk=n.comment.user.pk slug=n.comment.user.st.slug as url_profile %}
                 {% url "spirit:comment:find" pk=n.comment.pk as url_topic %}
 
@@ -14,7 +14,7 @@
                 {% endif %}
 
                 {% if not n.is_read %}
-                    <span class="row-unread">{% trans "unread" %}</span>
+                    <span class="spirit-row-unread">{% trans "unread" %}</span>
                 {% endif %}
             </div>
         {% empty %}

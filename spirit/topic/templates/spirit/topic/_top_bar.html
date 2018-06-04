@@ -2,14 +2,17 @@
 
     <div class="container">
 		<div class="categories js-tabs-container">
+                <ul class="nav nav-tabs">
             {% if category %}
-			    <a class="dropdown-button js-tab" href="#" data-related=".js-categories-content">{{ category.title }} <i class="fa fa-chevron-down"></i></a>
+                    <li><a class="header-tab-link js-tab" style="border-bottom-color: #65c3b4; text-decoration: none;" href="#" data-related=".js-categories-content">{{ category.title }} <i class="fa fa-chevron-down"></i></a></li>
 			{% else %}
-                <a class="dropdown-button js-tab" href="#" data-related=".js-categories-content">{% trans "All Categories" %} <i class="fa fa-chevron-down"></i></a>
+                    <li><a class="header-tab-link js-tab" style="border-bottom-color: #65c3b4; text-decoration: none;" href="#" data-related=".js-categories-content">{% trans "All Categories" %} <i class="fa fa-chevron-down"></i></a></li>
             {% endif %}
-
+            </ul>
+            
 			<div class="tab-content js-tab-content js-categories-content">
-				<ul class="menu">
+				<nav class="header-nav">
+				<ul class="nav nav-tabs submenu">
                     {% for c in categories %}
                         <li><a class="menu-link" href="{{ c.get_absolute_url }}" >{{ c.title }}</a></li>
                     {% endfor %}
@@ -19,14 +22,16 @@
                         <li><a class="menu-link" href="{% url "spirit:topic:index-active" %}" >{% trans "All Categories" %}</a></li>
                     {% endif %}
 				</ul>
+				</nav>
 			</div>
 		</div>
 
+
         <div class="new-topic">
             {% if category %}
-                <a class="button" href="{% url "spirit:topic:publish" category.pk %}">{% trans "Create Topic" %}</a>
+                <a type="button" class="btn btn-primary"  href="{% url "spirit:topic:publish" category.pk %}">{% trans "Create Topic" %}</a>
             {% else %}
-                <a class="button" href="{% url "spirit:topic:publish" %}">{% trans "Create Topic" %}</a>
+                <a type="button" class="btn btn-primary" href="{% url "spirit:topic:publish" %}">{% trans "Create Topic" %}</a>
             {% endif %}
 		</div>
 	</div>

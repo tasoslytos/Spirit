@@ -6,13 +6,13 @@
 
 {% block content %}
 
-    <h1 class="headline">{% trans "Add Category" %}</h1>
+    <h4 class="headline">{% trans "Add Category" %}</h4>
 
     <form action="." method="post">
         {% csrf_token %}
         {% include "spirit/_form.html" %}
 
-        <input class="button" type="submit" name="post" value="{% trans "Save" %}" />
+        <input class="btn btn-success" type="submit" name="post" value="{% trans "Save" %}" />
     </form>
 
 {% endblock %}
