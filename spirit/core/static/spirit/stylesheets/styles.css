@@ -6649,7 +6649,6 @@ input[type="search"],
 input[type="number"],
 select,
 textarea {
-  width: 100%;
   padding: 6px 12px;
   border: 1px solid #cecece; }
 
@@ -6700,7 +6699,7 @@ h2 {
   font-size: 21.33333px;
   line-height: 32.0px; }
 
-.comment-media::after, .container::after,
+.comment-media::after, .spirit-container::after,
 .header::after, .row::after,
 .comment::after, .comment-info::after, .menu-item::after {
   clear: both;
@@ -6834,15 +6833,10 @@ input[type="submit"].button,
   .side-menu-close:focus, .side-menu-close:hover {
     color: #fefefe; }
 
-.container,
+.spirit-container,
 .header {
   margin-bottom: 24px; }
 
-.header-logo {
-  float: left;
-  font-size: 28px;
-  line-height: 48px;
-  color: #444444; }
 
 .header-link {
   float: right;
@@ -6873,11 +6867,11 @@ input[type="submit"].button,
 .header-nav .menu {
   text-align: left; }
 
-.footer-container {
+.footer-spirit-container {
   max-width: 68em;
   margin-left: auto;
   margin-right: auto; }
-  .footer-container::after {
+  .footer-spirit-container::after {
     clear: both;
     content: "";
     display: table; }
@@ -7040,11 +7034,11 @@ input[type="submit"].button,
   background: #cecece;
   padding: 6px 0; }
 
-.move-container {
+.move-spirit-container {
   max-width: 68em;
   margin-left: auto;
   margin-right: auto; }
-  .move-container::after {
+  .move-spirit-container::after {
     clear: both;
     content: "";
     display: table; }
@@ -7136,10 +7130,9 @@ input.move-comment-checkbox {
   background: #e2f5fc; }
 
 .paginator {
-  margin-bottom: 24px; }
+ /* margin-bottom: 24px; */}
   @media screen and (min-width: 768px) {
     .paginator {
-      float: left;
       display: block;
       margin-right: 3.57866%;
       width: 48.21067%; }
@@ -7166,6 +7159,7 @@ input.move-comment-checkbox {
 .reply {
   padding: 12px; }
   .reply textarea {
+    width: 80%;
     height: 96px;
     margin-bottom: 12px; }
 
@@ -7439,8 +7433,8 @@ ul.reply-markdown {
       text-align: right; } }
 
 /*
-div.container {
-  @include outer-container;
+div.spirit-container {
+  @include outer-spirit-container;
   
   div.element {
     @include span-columns(4);

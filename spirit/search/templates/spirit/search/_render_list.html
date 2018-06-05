@@ -1,16 +1,16 @@
 {% load spirit_tags i18n %}
 
-<div class="rows">
+<div class="spirit-rows">
 
     {% for t in topics %}
-        <div class="row">
+        <div class="spirit-row">
 
-            <div class="row-title">
-                <a class="row-link" href="{% url 'spirit:topic:detail' pk=t.pk slug=t.fields.slug %}">
+            <div class="spirit-row-title">
+                <a class="spirit-row-link" href="{% url 'spirit:topic:detail' pk=t.pk slug=t.fields.slug %}">
                     {{ t.fields.title }}
                 </a>
             </div>
-            <div class="row-info">
+            <div class="spirit-row-info">
                 <div>{{ t.fields.main_category_name }}</div><!--
                  --><div><i class="fa fa-comment"></i> {{ t.fields.comment_count }}</div><!--
                  --><div title="{{ t.fields.last_active }}">
