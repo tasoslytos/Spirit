@@ -58,13 +58,11 @@ def publish(request, category_id=None):
             ###########################
             count_topics = Topic.objects.filter(user=user).count()
             if count_topics == 1:
-                #messages.success(request, _('Congratulations, you have won %d points.') % AWARD_POINTS['create_forum_topic_1'])
-                message.success(request, _('Congratulations, you have won many points.'))
+                messages.success(request, _('Congratulations, you have won %d points.') % AWARD_POINTS['create_forum_topic_1'])
             elif count_topics == 20:
-                #messages.success(request, _('Congratulations, you have won %d points.') % AWARD_POINTS['create_forum_topic_20'])
-                message.success(request, _('Congratulations, you have won %d points.'))
+                messages.success(request, _('Congratulations, you have won %d points.') % AWARD_POINTS['create_forum_topic_20'])
             else:
-                messages.success(request, _('Congratulations, you have won many points.') % AWARD_POINTS['create_forum_topic'])		
+                messages.success(request, _('Congratulations, you have won %d points.') % AWARD_POINTS['create_forum_topic'])		
             ###########################
             ###########################			
 			
