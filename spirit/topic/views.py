@@ -54,16 +54,15 @@ def publish(request, category_id=None):
 
             # wrap in transaction.atomic?
             topic = form.save()
-			
-			###########################
-			###########################
-			count_topics = Topic.objects.filter(user=user).count()
-			if count_topics == 1:
-			    #messages.success(request, _('Congratulations, you have won %d points.') % AWARD_POINTS['create_forum_topic_1'])
-				message.success(request, _('Congratulations, you have won %d points.'))
-			elif count_topics == 20:
-			    #messages.success(request, _('Congratulations, you have won %d points.') % AWARD_POINTS['create_forum_topic_20'])
-				message.success(request, _('Congratulations, you have won %d points.'))
+            ###########################
+            ###########################
+            count_topics = Topic.objects.filter(user=user).count()
+            if count_topics == 1:
+                #messages.success(request, _('Congratulations, you have won %d points.') % AWARD_POINTS['create_forum_topic_1'])
+                message.success(request, _('Congratulations, you have won %d points.'))
+            elif count_topics == 20:
+                #messages.success(request, _('Congratulations, you have won %d points.') % AWARD_POINTS['create_forum_topic_20'])
+                message.success(request, _('Congratulations, you have won %d points.'))
 			else:
 			    messages.success(request, _('Congratulations, you have won %d points.') % AWARD_POINTS['create_forum_topic'])		
 			###########################
