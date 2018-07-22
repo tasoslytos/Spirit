@@ -23,12 +23,7 @@ from . import utils
 from django.contrib import messages
 from django.utils.translation import ugettext as _
 
-
-##################################
-# pay attention here
 from user_rating.models import AWARD_POINTS
-##################################
-##################################
 
 
 @login_required
@@ -54,8 +49,8 @@ def publish(request, category_id=None):
 
             # wrap in transaction.atomic?
             topic = form.save()
-            ###########################
-            ###########################
+            
+            #pop-up message with AWARD
             count_topics = Topic.objects.filter(user=user).count()
             if count_topics == 1:
                 messages.success(request, _('Congratulations, you have won %d points.') % AWARD_POINTS['create_forum_topic_1'])
@@ -63,8 +58,7 @@ def publish(request, category_id=None):
                 messages.success(request, _('Congratulations, you have won %d points.') % AWARD_POINTS['create_forum_topic_20'])
             else:
                 messages.success(request, _('Congratulations, you have won %d points.') % AWARD_POINTS['create_forum_topic'])		
-            ###########################
-            ###########################			
+            #end-of pop-up message            		
 			
             cform.topic = topic
             comment = cform.save()
