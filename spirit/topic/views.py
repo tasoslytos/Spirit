@@ -20,6 +20,12 @@ from .forms import TopicForm
 from . import utils
 
 
+from django.contrib import messages
+from django.utils.translation import ugettext as _
+
+from user_rating.models import AWARD_POINTS
+
+
 @login_required
 @ratelimit(rate='1/10s')
 def publish(request, category_id=None):
@@ -43,6 +49,17 @@ def publish(request, category_id=None):
 
             # wrap in transaction.atomic?
             topic = form.save()
+            
+            #pop-up message with AWARD
+            count_topics = Topic.objects.filter(user=user).count()
+            if count_topics == 1:
+                messages.success(request, _('Congratulations, you have won %d points.') % AWARD_POINTS['create_forum_topic_1'])
+            elif count_topics == 20:
+                messages.success(request, _('Congratulations, you have won %d points.') % AWARD_POINTS['create_forum_topic_20'])
+            else:
+                messages.success(request, _('Congratulations, you have won %d points.') % AWARD_POINTS['create_forum_topic'])		
+            #end-of pop-up message            		
+			
             cform.topic = topic
             comment = cform.save()
             comment_posted(comment=comment, mentions=cform.mentions)

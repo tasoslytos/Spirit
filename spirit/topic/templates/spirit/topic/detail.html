@@ -6,17 +6,17 @@
 
 {% block content %}
 
-        <ul class="nav">
-            <li><a href="{% url "spirit:index" %}" >{% trans "Main" %}</a><i class="fa fa-chevron-right"></i></li>
+        <ul class="nav nav-tabs">
+            <li><a style="float: left; " href="{% url "spirit:index" %}" >{% trans "Main" %}<i style="margin-left:1em;" class="fa fa-chevron-right"></i></a></li>
 
             {% if topic.category.parent_id %}
-               <li><a href="{{ topic.category.parent.get_absolute_url }}" >{{ topic.category.parent.title }}</a><i class="fa fa-chevron-right"></i></li>
+               <li><a  style="float: left; " href="{{ topic.category.parent.get_absolute_url }}" >{{ topic.category.parent.title }}<i style="margin-left:1em;" class="fa fa-chevron-right"></i></a></li>
             {% endif %}
 
 		    <li><a href="{{ topic.category.get_absolute_url }}" >{{ topic.category.title }}</a></li>
         </ul>
 
-        <h1 class="headline">
+        <h4 class="headline">
             {% if topic.is_pinned or topic.is_globally_pinned %}
                 <i class="fa fa-thumb-tack"></i>
             {% endif %}
@@ -31,14 +31,14 @@
             {% elif user.pk == topic.user.pk and not topic.is_closed %}
                 <a class="head-edit-link" href="{% url "spirit:topic:update" topic.pk %}"><i class="fa fa-pencil"></i> {% trans "edit" %}</a>
             {% endif %}
-        </h1>
+        </h4>
 
         {% if user.st.is_moderator %}
             <div class="topic-moderation js-tabs-container">
                 <a class="dropdown-button js-tab" href="#" data-related=".js-mod-content"><i class="fa fa-cogs"></i></a>
 
                 <div class="tab-content js-tab-content js-mod-content">
-                    <ul class="menu">
+                    <ul class="nav nav-tabs submenu">
                         <li><a class="menu-link js-show-move-comments" href="#" ><i class="fa fa-comments"></i> {% trans "Select comments to move" %}</a></li>
 
                         {% if topic.is_removed %}
@@ -87,7 +87,7 @@
                 {% if user.is_authenticated %}
                     {% render_notification_form user=user topic=topic %}
                 {% elif not topic.is_closed %}
-                    <a class="button" href="{% url "spirit:comment:publish" topic_id=topic.pk %}">{% trans "Reply" %}</a>
+                    <a class="btn btn-primary" href="{% url "spirit:comment:publish" topic_id=topic.pk %}">{% trans "Reply" %}</a>
                 {% endif %}
             </div>
         </div>

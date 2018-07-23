@@ -6,20 +6,20 @@
 
 {% block content %}
 
-        <ul class="nav">
+        <ul class="nav nav-tabs active" >
             <li><a href="{% url "spirit:topic:private:index" %}" >{% trans "Private topics" %}</a></li>
         </ul>
 
-        <h1 class="headline">{{ topic.title }}</h1>
+        <h3 class="headline">{{ topic.title }}</h3>
 
         <div class="container">
             <div class="private-participants js-tabs-container">
-                <a class="dropdown-button js-tab" href="#" data-related=".js-participants-content">{% trans "Participants" %} <i class="fa fa-chevron-down"></i></a>
+                <a style="text-decoration: none;" class="nav nav-tabs js-tab" href="#" data-related=".js-participants-content">{% trans "Participants" %} <i class="fa fa-chevron-down"></i></a>
 
                 <div class="tab-content js-tab-content js-participants-content">
-                    <ul class="participants-menu">
+                    <ul class="nav nav-tabs submenu">
                         {% for tp in topic.topics_private.all %}
-                            <li class="menu-item"><span class="menu-username">{{ tp.user.username }}</span>{% ifequal user.pk topic.user.pk %}<a class="menu-icon" href="{% url "spirit:topic:private:access-remove" tp.pk %}" ><i class="fa fa-times"></i></a>{% endifequal %}</li>
+                            <li class="menu-item"><div style="float:left;"><span class="menu-username">{{ tp.user.username }}</span>{% ifequal user.pk topic.user.pk %}<a class="menu-icon" href="{% url "spirit:topic:private:access-remove" tp.pk %}" ><i style="padding-left: 1em;"class="fa fa-times"></i></a>{% endifequal %}<div style="float:left;"></li>
                         {% endfor %}
                     </ul>
 
@@ -30,7 +30,7 @@
             </div>
 
             <div class="private-leave">
-                <a class="button" href="{% url "spirit:topic:private:access-remove" topic_private.pk %}" ><i class="fa fa-times"></i>{% trans "Leave topic" %}</a>
+                <a class="btn btn-primary" href="{% url 'spirit:topic:private:access-remove' topic_private.pk %}" ><i class="fa fa-times"></i> {% trans "Leave topic" %}</a>
             </div>
         </div>
 
