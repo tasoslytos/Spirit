@@ -27,48 +27,50 @@
                         {% render_invite_form topic %}
                     {% endifequal %}
                 </div>
+
             </div>
+        </div>
 
             <div class="private-leave">
                 <a class="btn btn-primary" href="{% url 'spirit:topic:private:access-remove' topic_private.pk %}" ><i class="fa fa-times"></i> {% trans "Leave topic" %}</a>
             </div>
+
         </div>
+    </div>
 
-        {% include "spirit/comment/_render_list.html" %}
+    {% include "spirit/comment/_render_list.html" %}
 
-        {# this can be *included* here and in topic_detail #}
-        <div class="container">
-            {% render_paginator comments %}
+    {# this can be *included* here and in topic_detail #}
+    <div class="container">
+        {% render_paginator comments %}
 
-            <div class="notify">
-                {% render_notification_form user=user topic=topic %}
+        <div class="notify">
+            {% render_notification_form user=user topic=topic %}
+        </div>
+    </div>
+
+    <div id="reply" class="reply">
+
+        <div class="comment-media">
+            <div class="comment-img">
+                <img class="comment-avatar" src="{% get_gravatar_url user=user size=50 %}" />
+            </div>
+
+            <div class="comment-body">
+                {% render_comments_form topic=topic %}
             </div>
         </div>
 
-        <div id="reply" class="reply">
+    </div>
 
-            <div class="comment-media">
-                <div class="comment-img">
-                    <img class="comment-avatar" src="{% get_gravatar_url user=user size=50 %}" />
-                </div>
-
-                <div class="comment-body">
-                    {% render_comments_form topic=topic %}
-                </div>
-            </div>
-
-        </div>
-
-            <script>
-                $( document ).ready(function() {
-
-                    $( ".comment" ).bookmark( {
-                        csrfToken: "{{ csrf_token }}",
-                        target: "{% url "spirit:comment:bookmark:create" topic.pk %}",
-                    } );
-
-                });
-            </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            stModules.bookmark(document.querySelectorAll('.comment'), {
+                csrfToken: "{{ csrf_token }}",
+                target: "{% url "spirit:comment:bookmark:create" topic.pk %}"
+            });
+        });
+    </script>
 
 
 {% endblock %}

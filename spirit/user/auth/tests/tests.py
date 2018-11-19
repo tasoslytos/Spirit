@@ -3,12 +3,12 @@
 from __future__ import unicode_literals
 
 from django.test import TestCase
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.core import mail
 from django.utils.translation import ugettext as _
 from django.test.utils import override_settings
-from django.core.urlresolvers import NoReverseMatch
+from django.urls import NoReverseMatch
 
 from ....core.tests import utils
 from ..forms import RegistrationForm, ResendActivationForm, LoginForm
@@ -86,8 +86,8 @@ class UserViewTest(TestCase):
                      'email2': 'some@some.com', 'password': 'pass'}
         response = self.client.post(reverse('spirit:user:auth:register'), form_data)
         self.assertEqual(response.status_code, 302)
-        self.assertEquals(len(mail.outbox), 1)
-        self.assertEquals(mail.outbox[0].subject, _("User activation"))
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, _("User activation"))
 
     def test_register_next_logged_in(self):
         """
@@ -221,12 +221,12 @@ class UserViewTest(TestCase):
                                     form_data)
         expected_url = reverse("spirit:user:auth:login")
         self.assertRedirects(response, expected_url, status_code=302)
-        self.assertEquals(len(mail.outbox), 1)
-        self.assertEquals(mail.outbox[0].subject, _("User activation"))
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, _("User activation"))
 
         # get
         response = self.client.get(reverse('spirit:user:auth:resend-activation'))
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_resend_activation_email_invalid_previously_logged_in(self):
         """
@@ -240,8 +240,8 @@ class UserViewTest(TestCase):
                      'password': "foo"}
         response = self.client.post(reverse('spirit:user:auth:resend-activation'),
                                     form_data)
-        self.assertEquals(response.status_code, 302)
-        self.assertEquals(len(mail.outbox), 0)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(len(mail.outbox), 0)
 
     def test_resend_activation_email_invalid_email(self):
         """
@@ -252,8 +252,8 @@ class UserViewTest(TestCase):
         form_data = {'email': "bad@foo.com", }
         response = self.client.post(reverse('spirit:user:auth:resend-activation'),
                                     form_data)
-        self.assertEquals(response.status_code, 302)
-        self.assertEquals(len(mail.outbox), 0)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(len(mail.outbox), 0)
 
     def test_resend_activation_email_redirect_logged(self):
         """
@@ -548,7 +548,8 @@ class UserBackendTest(TestCase):
         self.user = utils.create_user(email="foobar@bar.com", password="bar")
 
     def test_email_auth_backend(self):
-        user = EmailAuthBackend().authenticate(username="foobar@bar.com", password="bar")
+        user = EmailAuthBackend().authenticate(
+            request=None, username="foobar@bar.com", password="bar")
         self.assertEqual(user, self.user)
 
     def test_email_auth_backend_email_duplication(self):
@@ -557,15 +558,18 @@ class UserBackendTest(TestCase):
         """
         utils.create_user(email="duplicated@bar.com", password="foo")
         utils.create_user(email="duplicated@bar.com", password="foo2")
-        user = EmailAuthBackend().authenticate(username="duplicated@bar.com", password="foo")
+        user = EmailAuthBackend().authenticate(
+            request=None, username="duplicated@bar.com", password="foo")
         self.assertIsNone(user)
 
     @override_settings(ST_CASE_INSENSITIVE_EMAILS=True)
     def test_email_auth_backend_case_insensitive(self):
-        user = EmailAuthBackend().authenticate(username="FooBar@bAr.COM", password="bar")
+        user = EmailAuthBackend().authenticate(
+            request=None, username="FooBar@bAr.COM", password="bar")
         self.assertEqual(user, self.user)
 
     @override_settings(ST_CASE_INSENSITIVE_EMAILS=False)
     def test_email_auth_backend_case_sensitive(self):
-        user = EmailAuthBackend().authenticate(username="FooBar@bAr.COM", password="bar")
+        user = EmailAuthBackend().authenticate(
+            request=None, username="FooBar@bAr.COM", password="bar")
         self.assertIsNone(user)

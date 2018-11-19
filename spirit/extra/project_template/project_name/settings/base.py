@@ -47,7 +47,6 @@ INSTALLED_APPS = [
     'spirit.topic.favorite',
     'spirit.topic.moderate',
     'spirit.topic.notification',
-    'spirit.topic.poll',  # todo: remove in Spirit v0.6
     'spirit.topic.private',
     'spirit.topic.unread',
 
@@ -63,7 +62,8 @@ INSTALLED_APPS = [
     'haystack',
 ]
 
-MIDDLEWARE_CLASSES = [
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -130,6 +130,7 @@ WSGI_APPLICATION = '{{ project_name }}.wsgi.application'
 
 LOGIN_URL = 'spirit:user:auth:login'
 LOGIN_REDIRECT_URL = 'spirit:user:update'
+LOGOUT_REDIRECT_URL = 'spirit:index'
 
 # Internationalization
 # https://docs.djangoproject.com/en/{{ docs_version }}/topics/i18n/

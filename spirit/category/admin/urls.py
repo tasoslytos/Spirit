@@ -7,8 +7,9 @@ from django.conf.urls import url
 from . import views
 
 
+app_name = 'category'
 urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'^create/$', views.create, name='create'),
-    url(r'^update/(?P<category_id>\d+)/$', views.update, name='update'),
+    url(r'^update/(?P<category_id>[0-9]+)/$', views.update, name='update'),
 ]

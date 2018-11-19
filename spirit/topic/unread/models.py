@@ -11,8 +11,13 @@ from ...core.conf import settings
 
 class TopicUnread(models.Model):
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='st_topics_unread')
-    topic = models.ForeignKey('spirit_topic.Topic')
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name='st_topics_unread',
+        on_delete=models.CASCADE)
+    topic = models.ForeignKey(
+        'spirit_topic.Topic',
+        on_delete=models.CASCADE)
 
     date = models.DateTimeField(default=timezone.now)
     is_read = models.BooleanField(default=True)
@@ -28,18 +33,17 @@ class TopicUnread(models.Model):
 
     @classmethod
     def create_or_mark_as_read(cls, user, topic):
-        if not user.is_authenticated():
+        if not user.is_authenticated:
             return
 
         return cls.objects.update_or_create(
             user=user,
             topic=topic,
-            defaults={'is_read': True, }
-        )
+            defaults={'is_read': True})
 
     @classmethod
     def unread_new_comment(cls, comment):
-        cls.objects\
-            .filter(topic=comment.topic)\
-            .exclude(user=comment.user)\
-            .update(is_read=False, date=timezone.now())
+        (cls.objects
+         .filter(topic=comment.topic)
+         .exclude(user=comment.user)
+         .update(is_read=False, date=timezone.now()))

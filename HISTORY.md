@@ -1,3 +1,33 @@
+0.6.2
+==================
+
+* Fix password reset
+* Make admin user-list redirect to the right
+  user profile when clicking on a username
+
+0.6.1
+==================
+
+* Update dependencies: `pillow==5.2.0` and `django-djconfig==0.8.0`
+
+0.6.0
+==================
+
+* Drops support for Django 1.8, 1.9 and 1.10
+* Adds support for Python 3.7 (no changes required)
+* Adds support for Django 2.0 and 2.1
+* Adds `django.middleware.security.SecurityMiddleware``to
+  `MIDDLEWARE_CLASSES` setting
+* Adds `LOGOUT_REDIRECT_URL = 'spirit:index'` to settings
+* Removes jQuery dependency in favor of vanilla JS
+* Fixes user's `last_seen` feature. There was a bug in the middleware
+  that would update the field pretty much on every request
+* Renames `MIDDLEWARE_CLASSES` (deprecated by django) setting to
+  `MIDDLEWARE`
+* Removes `spirit.settings` deprecated in Spirit 0.5
+* Avoids installing `spirit.topic.poll` app in the generated project
+* Updates haystack dependency to 2.8.1
+
 0.5.0
 ==================
 

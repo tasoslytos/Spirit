@@ -1,6 +1,4 @@
 language: python
-
-# Use container-based infrastructure
 sudo: false
 
 python:
@@ -9,10 +7,9 @@ python:
   - "3.5"
   - "3.6"
 env:
-  - DJANGO=1.8.18
-  - DJANGO=1.9.13
-  - DJANGO=1.10.8
-  - DJANGO=1.11.9
+  - DJANGO=1.11.15
+  - DJANGO=2.0.8
+  - DJANGO=2.1.1
 install:
   - pip install --upgrade pip
   - pip install .[files]
@@ -23,6 +20,26 @@ script:
   - flake8 --exit-zero
   - python setup.py build
   - python ./spirit/extra/bin/spirit.py startproject project
+  - export PYTHONWARNINGS="default"
   - coverage run --source=. runtests.py
 after_success:
   - coveralls
+matrix:
+  exclude:
+    - python: "2.7"
+      env: DJANGO=2.0.8
+    - python: "2.7"
+      env: DJANGO=2.1.1
+    - python: "3.4"
+      env: DJANGO=2.1.1
+  include:
+    - python: 3.7
+      dist: xenial
+      sudo: true
+      env:
+        - DJANGO=2.0.8
+    - python: 3.7
+      dist: xenial
+      sudo: true
+      env:
+        - DJANGO=2.1.1

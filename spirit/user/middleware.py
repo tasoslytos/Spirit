@@ -7,11 +7,7 @@ import pytz
 
 from django.contrib.auth import logout
 from django.utils import timezone
-
-try:
-    from django.utils.deprecation import MiddlewareMixin
-except ImportError:  # Django < 1.10
-    MiddlewareMixin = object
+from django.utils.deprecation import MiddlewareMixin
 
 from ..core.conf import settings
 from .models import UserProfile
@@ -29,22 +25,22 @@ logger = logging.getLogger('django')
 class TimezoneMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
-        if request.user.is_authenticated():
-            try:
-                timezone.activate(request.user.st.timezone)
-            except pytz.exceptions.UnknownTimeZoneError:
-                timezone.deactivate()
-                logger.error(
-                    '%s is not a valid timezone.' %
-                    request.user.st.timezone)
-        else:
+        if not request.user.is_authenticated:
             timezone.deactivate()
+            return
+
+        try:
+            timezone.activate(request.user.st.timezone)
+        except pytz.exceptions.UnknownTimeZoneError:
+            timezone.deactivate()
+            logger.error(
+                '%s is not a valid timezone.', request.user.st.timezone)
 
 
 class LastIPMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             return
 
         last_ip = request.META['REMOTE_ADDR'].strip()
@@ -60,24 +56,24 @@ class LastIPMiddleware(MiddlewareMixin):
 class LastSeenMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             return
 
         threshold = settings.ST_USER_LAST_SEEN_THRESHOLD_MINUTES * 60
         delta = timezone.now() - request.user.st.last_seen
 
-        if delta.seconds < threshold:
+        if delta.total_seconds() < threshold:
             return
 
         (UserProfile.objects
-            .filter(user__pk=request.user.pk)
+            .filter(pk=request.user.st.pk)
             .update(last_seen=timezone.now()))
 
 
 class ActiveUserMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             return
 
         if not request.user.is_active:

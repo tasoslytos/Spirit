@@ -10,21 +10,26 @@ from django.db import IntegrityError, transaction
 from .managers import TopicNotificationQuerySet
 from ...core.conf import settings
 
-
 UNDEFINED, MENTION, COMMENT = range(3)
 
 ACTION_CHOICES = (
     (UNDEFINED, _("Undefined")),
     (MENTION, _("Mention")),
-    (COMMENT, _("Comment")),
-)
+    (COMMENT, _("Comment")))
 
 
 class TopicNotification(models.Model):
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='st_topic_notifications')
-    topic = models.ForeignKey('spirit_topic.Topic')
-    comment = models.ForeignKey('spirit_comment.Comment')
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name='st_topic_notifications',
+        on_delete=models.CASCADE)
+    topic = models.ForeignKey(
+        'spirit_topic.Topic',
+        on_delete=models.CASCADE)
+    comment = models.ForeignKey(
+        'spirit_comment.Comment',
+        on_delete=models.CASCADE)
 
     date = models.DateTimeField(default=timezone.now)
     action = models.IntegerField(choices=ACTION_CHOICES, default=UNDEFINED)
@@ -40,6 +45,9 @@ class TopicNotification(models.Model):
         verbose_name_plural = _("topics notification")
 
     def get_absolute_url(self):
+        if self.topic_id != self.comment.topic_id:
+            # Out of sync
+            return self.topic.get_absolute_url()
         return self.comment.get_absolute_url()
 
     @property
@@ -56,12 +64,12 @@ class TopicNotification(models.Model):
 
     @classmethod
     def mark_as_read(cls, user, topic):
-        if not user.is_authenticated():
+        if not user.is_authenticated:
             return
 
-        cls.objects\
-            .filter(user=user, topic=topic)\
-            .update(is_read=True)
+        (cls.objects
+         .filter(user=user, topic=topic)
+         .update(is_read=True))
 
     @classmethod
     def create_maybe(cls, user, comment, is_read=True, action=COMMENT):
@@ -73,16 +81,14 @@ class TopicNotification(models.Model):
                 'comment': comment,
                 'action': action,
                 'is_read': is_read,
-                'is_active': True
-            }
-        )
+                'is_active': True})
 
     @classmethod
     def notify_new_comment(cls, comment):
-        cls.objects\
-            .filter(topic=comment.topic, is_active=True, is_read=True)\
-            .exclude(user=comment.user)\
-            .update(comment=comment, is_read=False, action=COMMENT, date=timezone.now())
+        (cls.objects
+         .filter(topic=comment.topic, is_active=True, is_read=True)
+         .exclude(user=comment.user)
+         .update(comment=comment, is_read=False, action=COMMENT, date=timezone.now()))
 
     @classmethod
     def notify_new_mentions(cls, comment, mentions):
@@ -98,14 +104,20 @@ class TopicNotification(models.Model):
                         topic=comment.topic,
                         comment=comment,
                         action=MENTION,
-                        is_active=True
-                    )
+                        is_active=True)
             except IntegrityError:
                 pass
 
-        cls.objects\
-            .filter(user__in=mentions.values(), topic=comment.topic, is_read=True)\
-            .update(comment=comment, is_read=False, action=MENTION, date=timezone.now())
+        (cls.objects
+         .filter(
+            user__in=mentions.values(),
+            topic=comment.topic,
+            is_read=True)
+         .update(
+            comment=comment,
+            is_read=False,
+            action=MENTION,
+            date=timezone.now()))
 
     @classmethod
     def bulk_create(cls, users, comment):
@@ -115,5 +127,30 @@ class TopicNotification(models.Model):
                 comment=comment,
                 action=COMMENT,
                 is_active=True)
-            for user in users
-        ])
+            for user in users])
+
+    # XXX add tests
+    # XXX fix with migration (see issue #237)
+    @classmethod
+    def sync(cls, comment, topic):
+        # Notifications can go out of sync
+        # when the comment is no longer
+        # within the topic (i.e moved).
+        # User is subscribed to the topic,
+        # not the comment, so we either update
+        # it to a newer comment or set it as undefined
+        if comment.topic_id == topic.pk:
+            return
+        next_comment = (
+            topic.comment_set
+                .filter(date__gt=comment.date)
+                .order_by('date')
+                .first())
+        if next_comment is None:
+            (cls.objects
+             .filter(comment=comment, topic=topic)
+             .update(is_read=True, action=UNDEFINED))
+            return
+        (cls.objects
+         .filter(comment=comment, topic=topic)
+         .update(comment=next_comment, action=COMMENT))

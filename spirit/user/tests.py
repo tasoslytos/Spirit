@@ -4,16 +4,18 @@ from __future__ import unicode_literals
 import datetime
 
 from django.test import TestCase, RequestFactory
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.auth import get_user_model, HASH_SESSION_KEY
 from django.core import mail
 from django.utils.translation import ugettext as _
 from django.utils import timezone
 from django.test.utils import override_settings
+from django.contrib.auth.models import AnonymousUser
 
 from djconfig.utils import override_djconfig
 
 from ..core.tests import utils
+from ..core.conf import settings
 from .forms import UserProfileForm, EmailChangeForm, UserForm, EmailCheckForm
 from ..comment.like.models import CommentLike
 from ..topic.models import Topic
@@ -23,6 +25,7 @@ from .utils.tokens import UserActivationTokenGenerator, UserEmailChangeTokenGene
 from .utils.email import send_activation_email, send_email_change_email, sender
 from .utils import email
 from . import middleware
+from .models import UserProfile
 
 User = get_user_model()
 
@@ -447,7 +450,7 @@ class UserViewTest(TestCase):
                                     form_data)
         expected_url = reverse("spirit:user:update")
         self.assertRedirects(response, expected_url, status_code=302)
-        self.assertEquals(len(mail.outbox), 1)
+        self.assertEqual(len(mail.outbox), 1)
         self.assertIn(_("Email change"), mail.outbox[0].subject)
 
         # get
@@ -746,7 +749,7 @@ class UtilsUserTests(TestCase):
         """
         req = RequestFactory().get('/')
         send_activation_email(req, self.user)
-        self.assertEquals(len(mail.outbox), 1)
+        self.assertEqual(len(mail.outbox), 1)
 
     def test_email_change_email(self):
         """
@@ -783,7 +786,7 @@ class UtilsUserTests(TestCase):
         """
         req = RequestFactory().get('/')
         send_email_change_email(req, self.user, "foo@bar.com")
-        self.assertEquals(len(mail.outbox), 1)
+        self.assertEqual(len(mail.outbox), 1)
 
     def test_sender(self):
         """
@@ -797,7 +800,7 @@ class UtilsUserTests(TestCase):
             return SiteMock
 
         def monkey_render_to_string(template, data):
-            self.assertEquals(template, template_name)
+            self.assertEqual(template, template_name)
             self.assertDictEqual(data, {'user_id': self.user.pk,
                                         'token': token,
                                         'site_name': SiteMock.name,
@@ -819,11 +822,11 @@ class UtilsUserTests(TestCase):
             email.get_current_site = org_site
             email.render_to_string = org_render_to_string
 
-        self.assertEquals(len(mail.outbox), 1)
-        self.assertEquals(mail.outbox[0].subject, SiteMock.name)
-        self.assertEquals(mail.outbox[0].body, "email body")
-        self.assertEquals(mail.outbox[0].from_email, "foo <noreply@bar.com>")
-        self.assertEquals(mail.outbox[0].to, [self.user.email, ])
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, SiteMock.name)
+        self.assertEqual(mail.outbox[0].body, "email body")
+        self.assertEqual(mail.outbox[0].from_email, "foo <noreply@bar.com>")
+        self.assertEqual(mail.outbox[0].to, [self.user.email, ])
 
     @override_settings(DEFAULT_FROM_EMAIL='foo@bar.com')
     def test_sender_from_email(self):
@@ -854,11 +857,11 @@ class UtilsUserTests(TestCase):
             email.get_current_site = org_site
             email.render_to_string = org_render_to_string
 
-        self.assertEquals(len(mail.outbox), 1)
-        self.assertEquals(mail.outbox[0].from_email, "foo@bar.com")
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].from_email, "foo@bar.com")
 
 
-class UserMiddlewareTest(TestCase):
+class TimezoneMiddlewareTest(TestCase):
 
     def setUp(self):
         timezone.deactivate()
@@ -898,6 +901,7 @@ class UserMiddlewareTest(TestCase):
     @override_settings(TIME_ZONE='UTC')
     def test_timezone_anonymous_user(self):
         class AnonymUserMock(object):
+            @property
             def is_authenticated(self):
                 return False
 
@@ -910,3 +914,236 @@ class UserMiddlewareTest(TestCase):
         self.assertEqual(timezone.get_current_timezone().zone, time_zone)
         middleware.TimezoneMiddleware().process_request(req)
         self.assertEqual(timezone.get_current_timezone().zone, 'UTC')
+
+
+class LastIPMiddlewareTest(TestCase):
+
+    def setUp(self):
+        utils.cache_clear()
+        self.user = utils.create_user()
+
+    def test_last_ip(self):
+        """
+        Should update user last_ip
+        """
+        req = RequestFactory().get('/')
+        req.user = self.user
+        self.assertIsNone(User.objects.get(pk=self.user.pk).st.last_ip)
+        req.META['REMOTE_ADDR'] = '123.123.123.123'
+        self.assertIsNone(middleware.LastIPMiddleware().process_request(req))
+        self.assertEqual(
+            User.objects.get(pk=self.user.pk).st.last_ip,
+            '123.123.123.123')
+        req.META['REMOTE_ADDR'] = '321.321.321.321'
+        self.assertIsNone(middleware.LastIPMiddleware().process_request(req))
+        self.assertEqual(
+            User.objects.get(pk=self.user.pk).st.last_ip,
+            '321.321.321.321')
+
+    def test_last_ip_no_update(self):
+        """
+        Should update user last_ip
+        """
+        req = RequestFactory().get('/')
+        req.user = self.user
+        self.user.st.last_ip = '123.123.123.123'
+        self.user.st.save()
+        self.assertEqual(
+            User.objects.get(pk=self.user.pk).st.last_ip,
+            '123.123.123.123')
+        req.META['REMOTE_ADDR'] = '123.123.123.123'
+        self.assertIsNone(middleware.LastIPMiddleware().process_request(req))
+        self.assertEqual(
+            User.objects.get(pk=self.user.pk).st.last_ip,
+            '123.123.123.123')
+
+    def test_last_ip_update(self):
+        """
+        Should update user last_ip
+        """
+        req = RequestFactory().get('/')
+        req.user = self.user
+        self.user.st.last_ip = '123.123.123.123'
+        self.user.st.save()
+        self.assertEqual(
+            User.objects.get(pk=self.user.pk).st.last_ip,
+            '123.123.123.123')
+        req.META['REMOTE_ADDR'] = '321.321.321.321'
+        self.assertIsNone(middleware.LastIPMiddleware().process_request(req))
+        self.assertEqual(
+            User.objects.get(pk=self.user.pk).st.last_ip,
+            '321.321.321.321')
+
+    def test_last_ip_anonym_user(self):
+        """
+        Should do nothing
+        """
+        req = RequestFactory().get('/')
+        req.user = AnonymousUser()
+        self.assertIsNone(middleware.LastIPMiddleware().process_request(req))
+
+    def test_on_client(self):
+        """
+        Should be called on a request
+        """
+        utils.login(self)
+        self.assertIsNone(User.objects.get(pk=self.user.pk).st.last_ip)
+        response = self.client.get(
+            reverse('spirit:index'), REMOTE_ADDR='123.123.123.123')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            User.objects.get(pk=self.user.pk).st.last_ip,
+            '123.123.123.123')
+
+
+class LastSeenMiddlewareTest(TestCase):
+
+    def setUp(self):
+        utils.cache_clear()
+        self.user = utils.create_user()
+
+    @override_settings(ST_USER_LAST_SEEN_THRESHOLD_MINUTES=1)
+    def test_last_seen(self):
+        """
+        Should update user last_seen when threshold is reached
+        """
+        req = RequestFactory().get('/')
+        req.user = self.user
+        self.assertTrue(req.user.is_authenticated)
+        delta = datetime.timedelta(
+            seconds=settings.ST_USER_LAST_SEEN_THRESHOLD_MINUTES * 60 + 1)
+        self.assertEqual(
+            UserProfile.objects
+                .filter(pk=req.user.st.pk)
+                .update(last_seen=timezone.now() - delta), 1)
+        # Some DBs don't save microseconds, so get the real value
+        last_seen = UserProfile.objects.get(pk=req.user.st.pk).last_seen
+        req.user.st.last_seen = last_seen
+        self.assertIsNone(
+            middleware.LastSeenMiddleware().process_request(req))
+        self.assertGreater(
+            UserProfile.objects.get(pk=req.user.st.pk).last_seen,
+            last_seen)
+
+    @override_settings(ST_USER_LAST_SEEN_THRESHOLD_MINUTES=1)
+    def test_last_seen_no_update(self):
+        """
+        Should not update user last_seen when threshold is not reached
+        """
+        req = RequestFactory().get('/')
+        req.user = self.user
+        self.assertTrue(req.user.is_authenticated)
+        delta = datetime.timedelta(
+            seconds=settings.ST_USER_LAST_SEEN_THRESHOLD_MINUTES * 60 - 1)
+        self.assertEqual(
+            UserProfile.objects
+                .filter(pk=req.user.st.pk)
+                .update(last_seen=timezone.now() - delta), 1)
+        last_seen = UserProfile.objects.get(pk=req.user.st.pk).last_seen
+        req.user.st.last_seen = last_seen
+        self.assertIsNone(
+            middleware.LastSeenMiddleware().process_request(req))
+        self.assertEqual(
+            UserProfile.objects.get(pk=req.user.st.pk).last_seen,
+            last_seen)
+
+    def test_last_seen_anonym_user(self):
+        """
+        Should do nothing
+        """
+        req = RequestFactory().get('/')
+        req.user = AnonymousUser()
+        self.assertFalse(req.user.is_authenticated)
+        self.assertIsNone(
+            middleware.LastSeenMiddleware().process_request(req))
+
+    @override_settings(ST_USER_LAST_SEEN_THRESHOLD_MINUTES=1)
+    def test_on_client(self):
+        """
+        Should be called on a request
+        """
+        utils.login(self)
+        delta = datetime.timedelta(
+            seconds=settings.ST_USER_LAST_SEEN_THRESHOLD_MINUTES * 60 + 1)
+        self.assertEqual(
+            UserProfile.objects
+                .filter(pk=self.user.st.pk)
+                .update(last_seen=timezone.now() - delta), 1)
+        last_seen = UserProfile.objects.get(pk=self.user.st.pk).last_seen
+        response = self.client.get(reverse('spirit:index'))
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(
+            UserProfile.objects.get(pk=self.user.st.pk).last_seen,
+            last_seen)
+
+
+class ActiveUserMiddlewareTest(TestCase):
+
+    def setUp(self):
+        utils.cache_clear()
+        self.user = utils.create_user()
+
+    def test_active_user(self):
+        """
+        Should logout inactive user
+        """
+        utils.login(self)
+        response = self.client.get(reverse('spirit:index'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(self.client.session.items())
+        User.objects.filter(pk=self.user.pk).update(is_active=False)
+        self.user.is_active = False
+        response = self.client.get(reverse('spirit:index'))
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(self.client.session.items())
+
+    def test_active_user_mocked(self):
+        """
+        Should logout inactive user
+        """
+        client = self.client
+        assertTrue = self.assertTrue
+        assertFalse = self.assertFalse
+
+        class ActiveUserMiddlewareMock(middleware.ActiveUserMiddleware):
+            _calls = []
+            def process_request(self, request):
+                self._calls.append(request)
+                assertTrue(client.session.items())
+                ret = super(ActiveUserMiddlewareMock, self).process_request(request)
+                assertFalse(client.session.items())
+                return ret
+
+        utils.login(self)
+        User.objects.filter(pk=self.user.pk).update(is_active=False)
+        self.user.is_active = False
+        self.assertFalse(ActiveUserMiddlewareMock._calls)
+
+        org_mid, middleware.ActiveUserMiddleware = (
+            middleware.ActiveUserMiddleware, ActiveUserMiddlewareMock)
+        try:
+            self.client.get(reverse('spirit:index'))
+        finally:
+            middleware.ActiveUserMiddleware = org_mid
+
+        self.assertTrue(ActiveUserMiddlewareMock._calls)
+
+    def test_active_user_is_active(self):
+        """
+        Should do nothing
+        """
+        req = RequestFactory().get('/')
+        req.user = self.user
+        self.assertTrue(req.user.is_authenticated)
+        self.assertIsNone(
+            middleware.ActiveUserMiddleware().process_request(req))
+
+    def test_active_user_anonym_user(self):
+        """
+        Should do nothing
+        """
+        req = RequestFactory().get('/')
+        req.user = AnonymousUser()
+        self.assertFalse(req.user.is_authenticated)
+        self.assertIsNone(
+            middleware.ActiveUserMiddleware().process_request(req))
