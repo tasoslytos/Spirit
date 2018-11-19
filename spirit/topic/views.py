@@ -49,7 +49,7 @@ def publish(request, category_id=None):
 
             # wrap in transaction.atomic?
             topic = form.save()
-            
+
             #pop-up message with AWARD
             count_topics = Topic.objects.filter(user=user).count()
             if count_topics == 1:
@@ -57,9 +57,9 @@ def publish(request, category_id=None):
             elif count_topics == 20:
                 messages.success(request, _('Congratulations, you have won %d points.') % AWARD_POINTS['create_forum_topic_20'])
             else:
-                messages.success(request, _('Congratulations, you have won %d points.') % AWARD_POINTS['create_forum_topic'])		
-            #end-of pop-up message            		
-			
+                messages.success(request, _('Congratulations, you have won %d points.') % AWARD_POINTS['create_forum_topic'])
+            #end-of pop-up message
+
             cform.topic = topic
             comment = cform.save()
             comment_posted(comment=comment, mentions=cform.mentions)
